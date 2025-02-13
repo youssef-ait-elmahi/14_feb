@@ -11,11 +11,10 @@
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-  <!-- The fixed background is set via CSS -->
   <div id="app">
     <!-- Stage 1: Heart Healing -->
     <div id="heart-stage" class="stage active">
-      <svg id="heartSVG" width="240" height="240" viewBox="0 0 100 100" style="cursor: pointer;">
+      <svg id="heartSVG" viewBox="0 0 100 100" style="cursor: pointer;">
         <defs>
           <clipPath id="heartClip">
             <rect id="fillRect" x="0" y="100" width="100" height="0" />
@@ -47,7 +46,7 @@
     <div id="memory-stage" class="stage">
       <h2 class="stage-title">Memory Matching Game</h2>
       <div id="memory-grid" class="grid">
-        <!-- Cards generated dynamically via JS -->
+        <!-- Cards generated dynamically by JS -->
       </div>
     </div>
 
@@ -55,7 +54,7 @@
     <div id="puzzle-stage" class="stage">
       <h2 class="stage-title">Jigsaw Puzzle</h2>
       <div id="puzzle-grid" class="grid puzzle-grid">
-        <!-- Puzzle pieces generated dynamically via JS -->
+        <!-- Puzzle pieces generated dynamically by JS -->
       </div>
     </div>
 
@@ -88,7 +87,7 @@
     <!-- Stage 7: Final Certificate -->
     <div id="certificate-stage" class="stage">
       <div id="certificate-content">
-        <!-- Certificate content will be generated dynamically -->
+        <!-- Certificate content generated dynamically -->
       </div>
       <button id="screenshot-btn">Take Screenshot</button>
     </div>
@@ -111,7 +110,7 @@
     </div>
   </div>
 
-  <!-- Audio Elements -->
+  <!-- Audio elements -->
   <audio id="reviveSound" src="audio/revive.mp3"></audio>
   <audio id="heartbeatSound" src="audio/heartbeat.mp3" loop></audio>
   <audio id="cardFlipSound" src="audio/card-flip.mp3"></audio>
