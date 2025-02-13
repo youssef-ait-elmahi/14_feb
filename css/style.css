@@ -1,0 +1,348 @@
+/* Global Reset and Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: 'Open Sans', Arial, sans-serif;
+    background: #111;
+    color: #fff;
+    overflow: hidden;
+    transition: background 1s ease;
+  }
+  
+  body.live-background {
+    background: linear-gradient(135deg, #ff758c, #ff7eb3, #fca5f1);
+    animation: dynamicBackground 10s infinite alternate;
+  }
+  
+  @keyframes dynamicBackground {
+    0% { filter: brightness(0.9); }
+    100% { filter: brightness(1.1); }
+  }
+  
+  #app {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+  }
+  
+  /* Stage Styles */
+  .stage {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    transition: opacity 1s ease;
+    pointer-events: none;
+  }
+  .stage.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  
+  .stage-title {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 2rem;
+    font-family: 'Great Vibes', cursive;
+    text-shadow: 1px 1px 3px #000;
+  }
+  
+  /* Heart Stage */
+  #heart-stage {
+    display: flex;
+    justify-content: center;
+  }
+  
+  #heartSVG {
+    filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.5));
+    transition: filter 0.5s ease;
+  }
+  #heartSVG.alive {
+    filter: drop-shadow(0 0 20px rgba(255, 0, 128, 0.8));
+  }
+  
+  /* Grid Layout for Memory Game and Puzzle */
+  .grid {
+    display: grid;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+  }
+  #memory-grid {
+    grid-template-columns: repeat(4, 80px);
+    grid-template-rows: repeat(4, 80px);
+  }
+  .card {
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+    cursor: pointer;
+    user-select: none;
+    transition: transform 0.3s ease;
+  }
+  .card.flipped {
+    background: #fdd;
+    transform: rotateY(180deg);
+  }
+  
+  #puzzle-grid {
+    grid-template-columns: repeat(3, 100px);
+    grid-template-rows: repeat(3, 100px);
+  }
+  .puzzle-piece {
+    width: 100px;
+    height: 100px;
+    background-size: 300px 300px;
+    border: 1px solid #fff;
+    cursor: grab;
+    transition: transform 0.2s;
+  }
+  .puzzle-piece.dragging {
+    opacity: 0.5;
+  }
+  
+  /* Branching Stage ("Do you love me?") */
+  #branching-stage {
+    text-align: center;
+  }
+  .branching-buttons button {
+    font-size: 1.5rem;
+    margin: 10px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background: #ff4081;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  .branching-buttons button:hover {
+    background: #e91e63;
+  }
+  
+  /* Quotes Stage Styling */
+  #quotes-stage {
+    text-align: center;
+  }
+  #quotes-container {
+    font-family: 'Dancing Script', cursive;
+    font-size: 2rem;
+    padding: 20px;
+  }
+  
+  /* Form Stage Styling */
+  #form-stage form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  #form-stage input, #form-stage textarea {
+    width: 80%;
+    max-width: 400px;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-family: 'Open Sans', Arial, sans-serif;
+  }
+  #form-stage button {
+    padding: 10px 20px;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 5px;
+    background: #ff4081;
+    color: #fff;
+    cursor: pointer;
+  }
+  
+  /* Redesigned Certificate Stage */
+  #certificate-stage {
+    background: linear-gradient(45deg, #fff5f5, #fff);
+    border: 20px solid #ffd1dc;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+    position: relative;
+    overflow: visible;
+    width: 800px;
+    height: 600px;
+    margin: 50px auto;
+    color: #333;
+  }
+  
+  #certificate-stage::before,
+  #certificate-stage::after {
+    content: "";
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    opacity: 0.2;
+  }
+  
+  #certificate-stage::before {
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23ff4081" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>');
+    top: 20px;
+    left: 20px;
+  }
+  
+  #certificate-stage::after {
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23ff4081" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>');
+    bottom: 20px;
+    right: 20px;
+    transform: rotate(180deg);
+  }
+  
+  .quote-piece {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.1rem;
+    color: #6d4c4c;
+    background: rgba(255, 245, 245, 0.9);
+    border-radius: 5px;
+    padding: 8px 12px;
+    border: 1px solid #ffb3c6;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    opacity: 0.9;
+    transition: transform 0.3s ease;
+    position: absolute;
+    width: 150px;
+  }
+  
+  .quote-piece:hover {
+    transform: scale(1.05) rotate(3deg);
+    z-index: 1;
+  }
+  
+  #certificate-central {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 30px 40px;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(5px);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+  
+  #certificate-central h2 {
+    font-size: 3.5rem;
+    color: #c7375f;
+    margin-bottom: 20px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    font-family: 'Great Vibes', cursive;
+  }
+  
+  #certificate-central p {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    color: #5a3a3a;
+    line-height: 1.6;
+    max-width: 500px;
+    margin: 20px auto;
+  }
+  
+  #certificate-central p::before {
+    content: open-quote;
+    font-size: 2.5rem;
+    color: #ff7aa3;
+    margin-right: 10px;
+  }
+  
+  #certificate-central p::after {
+    content: close-quote;
+    font-size: 2.5rem;
+    color: #ff7aa3;
+    margin-left: 10px;
+  }
+  
+  #screenshot-btn {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(45deg, #ff7aa3, #ff4081);
+    padding: 12px 30px;
+    font-size: 1.3rem;
+    border-radius: 25px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  
+  #screenshot-btn:hover {
+    transform: translateX(-50%) scale(1.05);
+    box-shadow: 0 5px 15px rgba(255, 64, 129, 0.3);
+  }
+  
+  #screenshot-btn::before {
+    content: '';
+    display: block;
+    width: 20px;
+    height: 20px;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="white" d="M14 3h-4v2h4V3m-1 14c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2m6-6V8c0-1.1-.9-2-2-2h-2.1c-.2-1.1-1.2-2-2.4-2h-3c-1.2 0-2.2.9-2.4 2H6c-1.1 0-2 .9-2 2v7c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2m-2 0H6V8h2v3h2V8h4v3h2V8h2v7z"/></svg>');
+  }
+    
+  /* Final View Styling */
+  #final-view-stage {
+    text-align: center;
+  }
+  #final-view-stage h2 {
+    font-size: 2.5rem;
+    font-family: 'Great Vibes', cursive;
+  }
+  #final-view-stage p {
+    font-size: 1.8rem;
+    margin-top: 20px;
+    font-family: 'Open Sans', sans-serif;
+  }
+  
+  /* Modal Popup Styles */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 100;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.7);
+  }
+  .modal-content {
+    background-color: #fff;
+    margin: 15% auto;
+    padding: 20px;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 400px;
+    text-align: center;
+    color: #333;
+    font-family: 'Open Sans', sans-serif;
+  }
+  .modal-buttons button {
+    margin: 10px;
+    padding: 10px 20px;
+    border: none;
+    background: #ff4081;
+    color: #fff;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+  
