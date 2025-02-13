@@ -388,9 +388,9 @@ function startQuotesSlideshow() {
       clearInterval(quoteInterval);
       setTimeout(() => {
         transitionToStage('form');
-      }, 1000);
+      }, 1200);
     }
-  }, 3000);
+  }, 6500);
 }
 
 /* ===============================
