@@ -12,7 +12,7 @@ const stages = {
 };
 const body = document.body;
 
-// Audio Elements
+// Audio elements
 const reviveSound = document.getElementById('reviveSound');
 const heartbeatSound = document.getElementById('heartbeatSound');
 const cardFlipSound = document.getElementById('cardFlipSound');
@@ -93,8 +93,14 @@ function updateHeartState() {
   }
 }
 
+// Heart click event with beat animation
 heartSVG.addEventListener('click', () => {
   if (bloodLevel < maxBlood) {
+    heartSVG.classList.add("beat");
+    heartSVG.addEventListener("animationend", function removeBeat() {
+      heartSVG.classList.remove("beat");
+      heartSVG.removeEventListener("animationend", removeBeat);
+    });
     bloodLevel = Math.min(bloodLevel + clickIncrement, maxBlood);
     updateHeartFill();
     updateHeartState();
@@ -232,6 +238,9 @@ function createPuzzlePieces(imageUrl) {
       piece.addEventListener('drop', onDrop);
       piece.addEventListener('dragend', onDragEnd);
       
+      // Add touch event listener for mobile tap-swap
+      piece.addEventListener('touchend', handleTouchSwap);
+      
       puzzleGrid.appendChild(piece);
       puzzlePieces.push(piece);
     }
@@ -264,22 +273,51 @@ function onDrop(e) {
   const targetPiece = e.currentTarget;
   if (draggedPiece === targetPiece) return;
   
-  const tempIndex = draggedPiece.dataset.currentIndex;
-  draggedPiece.dataset.currentIndex = targetPiece.dataset.currentIndex;
-  targetPiece.dataset.currentIndex = tempIndex;
-  
-  const tempOrder = draggedPiece.style.order;
-  draggedPiece.style.order = targetPiece.style.order;
-  targetPiece.style.order = tempOrder;
+  swapPieces(draggedPiece, targetPiece);
   
   puzzleDropSound.currentTime = 0;
   puzzleDropSound.play();
-  
   checkPuzzleSolved();
 }
 function onDragEnd(e) {
   e.currentTarget.classList.remove('dragging');
   draggedPiece = null;
+}
+
+// Function to swap two puzzle pieces (used for drag and touch)
+function swapPieces(piece1, piece2) {
+  let tempIndex = piece1.dataset.currentIndex;
+  piece1.dataset.currentIndex = piece2.dataset.currentIndex;
+  piece2.dataset.currentIndex = tempIndex;
+  
+  let tempOrder = piece1.style.order;
+  piece1.style.order = piece2.style.order;
+  piece2.style.order = tempOrder;
+  
+  // Remove any "selected" highlight if present
+  piece1.classList.remove('selected');
+  piece2.classList.remove('selected');
+}
+
+// Touch-based swapping for mobile devices
+let selectedPiece = null;
+function handleTouchSwap(e) {
+  e.preventDefault();
+  const piece = e.currentTarget;
+  // If no piece is selected, mark this one as selected
+  if (!selectedPiece) {
+    selectedPiece = piece;
+    piece.classList.add('selected');
+  } else if (selectedPiece === piece) {
+    // Tapping the same piece deselects it
+    selectedPiece.classList.remove('selected');
+    selectedPiece = null;
+  } else {
+    // Swap the selected piece with the tapped piece
+    swapPieces(selectedPiece, piece);
+    selectedPiece = null;
+    checkPuzzleSolved();
+  }
 }
 
 function checkPuzzleSolved() {
@@ -379,7 +417,7 @@ function generateCertificate() {
   const certificateContent = document.getElementById('certificate-content');
   certificateContent.innerHTML = "";
   
-  // Create scattered quote pieces using the new design
+  // Create scattered quote pieces
   loveQuotes.forEach(quote => {
     const quoteDiv = document.createElement('div');
     quoteDiv.classList.add('quote-piece');
@@ -415,7 +453,7 @@ document.getElementById('screenshot-btn').addEventListener('click', () => {
   setTimeout(() => {
     transitionToStage('final');
     showFinalMessage();
-  }, 5200);
+  }, 5000);
 });
 
 /* ===============================
