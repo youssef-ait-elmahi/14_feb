@@ -6,10 +6,12 @@ const stages = {
   puzzle: document.getElementById('puzzle-stage'),
   branching: document.getElementById('branching-stage'),
   quotes: document.getElementById('quotes-stage'),
-  form: document.getElementById('promise-form'), // if exists
+  form: document.getElementById('promise-form'), // optional form element if exists
   certificate: document.getElementById('certificate-stage'),
   final: document.getElementById('final-view-stage')
 };
+document.body.classList.add('dark-background');
+
 const body = document.body;
 
 /* Audio elements */
@@ -82,11 +84,11 @@ function updateHeartState() {
       heartbeatSound.currentTime = 0;
       heartbeatSound.play();
     }
-    // Remove dark background and grayscale from heart stage
-    document.getElementById('heart-stage').classList.add('active-color');
-    // Also, change body background from dark to colored
+    // When the heart is fully revived, remove dark background and add colored background to the body.
     body.classList.remove('dark-background');
     body.classList.add('colored-background');
+    // Also remove grayscale from the heart stage container
+    document.getElementById('heart-stage').classList.add('active-color');
     setTimeout(() => {
       transitionToStage('memory');
     }, 6000);
@@ -96,6 +98,8 @@ function updateHeartState() {
     heartbeatSound.currentTime = 0;
   }
 }
+
+
 
 heartSVG.addEventListener('click', () => {
   if (bloodLevel < maxBlood) {
@@ -317,10 +321,8 @@ function createPuzzlePieces(imageUrl) {
       piece.addEventListener('drop', onDrop);
       piece.addEventListener('dragend', onDragEnd);
       
-      // Mobile drag support using touch events:
-      piece.addEventListener("touchstart", mobileTouchStart, false);
-      piece.addEventListener("touchmove", mobileTouchMove, false);
-      piece.addEventListener("touchend", mobileTouchEnd, false);
+      // Touch-based swapping for mobile (tap-to-swap)
+      piece.addEventListener('touchend', handleTouchSwap);
       
       puzzleGrid.appendChild(piece);
       puzzlePieces.push(piece);
@@ -378,63 +380,22 @@ function swapPieces(piece1, piece2) {
   piece2.classList.remove('selected');
 }
 
-/* Mobile Drag Support for Puzzle Pieces */
-let mobileDraggedPiece = null;
-let mobileTouchOffsetX = 0;
-let mobileTouchOffsetY = 0;
-
-function mobileTouchStart(e) {
+// Touch-based swapping for mobile (tap-to-swap)
+let selectedPiece = null;
+function handleTouchSwap(e) {
   e.preventDefault();
-  mobileDraggedPiece = e.currentTarget;
-  mobileDraggedPiece.style.position = "absolute";
-  mobileDraggedPiece.style.zIndex = 1000;
-  const touch = e.touches[0];
-  const rect = mobileDraggedPiece.getBoundingClientRect();
-  mobileTouchOffsetX = touch.clientX - rect.left;
-  mobileTouchOffsetY = touch.clientY - rect.top;
-}
-
-function mobileTouchMove(e) {
-  e.preventDefault();
-  if (!mobileDraggedPiece) return;
-  const touch = e.touches[0];
-  const newX = touch.clientX - mobileTouchOffsetX;
-  const newY = touch.clientY - mobileTouchOffsetY;
-  mobileDraggedPiece.style.left = newX + "px";
-  mobileDraggedPiece.style.top = newY + "px";
-}
-
-function mobileTouchEnd(e) {
-  e.preventDefault();
-  if (!mobileDraggedPiece) return;
-  // Check for collision with another piece
-  let target = null;
-  const draggedRect = mobileDraggedPiece.getBoundingClientRect();
-  puzzlePieces.forEach(piece => {
-    if (piece === mobileDraggedPiece) return;
-    const rect = piece.getBoundingClientRect();
-    if (overlap(draggedRect, rect)) {
-      target = piece;
-    }
-  });
-  if (target) {
-    swapPieces(mobileDraggedPiece, target);
+  const piece = e.currentTarget;
+  if (!selectedPiece) {
+    selectedPiece = piece;
+    piece.classList.add('selected');
+  } else if (selectedPiece === piece) {
+    selectedPiece.classList.remove('selected');
+    selectedPiece = null;
   } else {
-    mobileDraggedPiece.style.left = "";
-    mobileDraggedPiece.style.top = "";
+    swapPieces(selectedPiece, piece);
+    selectedPiece = null;
+    checkPuzzleSolved();
   }
-  mobileDraggedPiece.style.position = "";
-  mobileDraggedPiece.style.zIndex = "";
-  mobileDraggedPiece = null;
-}
-
-function overlap(rect1, rect2) {
-  return !(
-    rect1.right < rect2.left ||
-    rect1.left > rect2.right ||
-    rect1.bottom < rect2.top ||
-    rect1.top > rect2.bottom
-  );
 }
 
 function checkPuzzleSolved() {
@@ -504,7 +465,7 @@ function startQuotesSlideshow() {
     } else {
       clearInterval(quoteInterval);
       setTimeout(() => {
-        // After quotes, if hashed data exists, go to certificate; otherwise, show final view with fixed last quote.
+        // After quotes, if hashed data exists, go to certificate; else, show final view with fixed last quote.
         const data = getHashedData();
         if (data && data.yourName && data.partnerName) {
           certificateData = {
@@ -535,6 +496,7 @@ if (getHashedData() && getHashedData().yourName && getHashedData().partnerName) 
     soulmateName: data.partnerName,
     promiseText: data.promise || "Our love is eternal."
   };
+  // Proceed normally through stages.
 } else if(promiseForm) {
   promiseForm.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -573,7 +535,7 @@ function generateCertificate() {
   certificateContent.appendChild(certImage);
 }
 
-// Download button on certificate stage with higher quality
+// Download button on certificate stage
 document.getElementById('download-btn').addEventListener('click', () => {
   html2canvas(document.getElementById('certificate-stage'), { scale: 2 }).then(canvas => {
     const link = document.createElement('a');
@@ -619,20 +581,3 @@ window.onclick = function(event) {
     modal.style.display = "none";
   }
 };
-
-/* ===============================
-   Utility: Get Hashed Data from URL Hash
-   =============================== */
-function getHashedData() {
-  if (window.location.hash.startsWith("#data=")) {
-    try {
-      const encoded = window.location.hash.substring(6);
-      const jsonStr = atob(encoded);
-      return JSON.parse(jsonStr);
-    } catch (e) {
-      console.error("Error decoding hashed data:", e);
-      return null;
-    }
-  }
-  return null;
-}
