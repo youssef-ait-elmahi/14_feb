@@ -3,246 +3,270 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  user-select: none;
 }
 
-body {
-  font-family: 'Open Sans', Arial, sans-serif;
-  background: #111;
-  color: #fff;
-  overflow-x: hidden;
+::selection {
+  background: transparent;
+}
+/* Body background setup */
+body.dark-background {
+  background: #000; /* Fully dark background during healing */
   transition: background 1s ease;
 }
 
-body.live-background {
+body.colored-background {
   background: linear-gradient(135deg, #ff758c, #ff7eb3, #fca5f1);
-  animation: dynamicBackground 10s infinite alternate;
+  transition: background 1s ease;
 }
 
-@keyframes dynamicBackground {
-  0% { filter: brightness(0.9); }
-  100% { filter: brightness(1.1); }
+body {
+  font-family: 'Playfair Display', serif;
+  background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 50%, #fca5f1 100%);
+  color: #333;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
 }
 
 #app {
-  position: relative;
   width: 100%;
-  min-height: 100vh;
-  padding: 10px;
+  max-width: 800px;
+  background-color: rgba(255,255,255,0.95);
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  overflow: hidden;
 }
 
 /* Stage Styles */
 .stage {
-  position: relative;
-  max-width: 100%;
-  margin: 0 auto;
+  display: none;
   opacity: 0;
-  transition: opacity 1s ease;
-  pointer-events: none;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  padding: 40px;
+  transform: translateY(20px);
 }
 
 .stage.active {
+  display: block;
   opacity: 1;
-  pointer-events: auto;
+  transform: translateY(0);
 }
 
 .stage-title {
   text-align: center;
-  margin-bottom: 20px;
-  font-size: 2rem;
+  margin-bottom: 30px;
+  font-size: 2.5rem;
   font-family: 'Great Vibes', cursive;
-  text-shadow: 1px 1px 3px #000;
+  color: #ff4081;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
 }
 
 /* Heart Stage */
 #heart-stage {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 20px;
+  text-align: center;
+  position: relative;
+  /* Entire viewport is dark until heart is full */
+  background-color: #000;
+  /* filter: grayscale(100%); */
+  transition: filter 1s ease, background-color 1s ease;
 }
 
-/* Remove tap highlight and focus outlines */
+#heart-stage.active-color {
+  filter: grayscale(0%);
+  background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 50%, #fca5f1 100%);
+  
+}
+
 #heartSVG {
+  width: 200px;
+  height: 200px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
   -webkit-tap-highlight-color: transparent;
   outline: none;
-  /* Responsive sizing */
-  width: 80vw;
-  max-width: 300px;
-  height: auto;
-  cursor: pointer;
 }
 
-/* Beat Animation */
+#heartSVG:hover {
+  transform: scale(1.05);
+}
+
+/* Beat Animation (on click while healing) */
 @keyframes beatAnimation {
   0% { transform: scale(1); }
-  25% { transform: scale(1.1); }
-  50% { transform: scale(0.95); }
-  75% { transform: scale(1.1); }
-  100% { transform: scale(1); }
+  14% { transform: scale(1.3); }
+  28% { transform: scale(1); }
+  42% { transform: scale(1.3); }
+  70% { transform: scale(1); }
 }
 
 #heartSVG.beat {
-  animation: beatAnimation 0.6s ease-in-out;
+  animation: beatAnimation 0.7s ease-in-out;
+}
+
+/* Continuous beat when alive */
+@keyframes continuousBeat {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
 }
 
 #heartSVG.alive {
-  filter: drop-shadow(0 0 20px rgba(255, 0, 128, 0.8));
+  animation: continuousBeat 1s infinite;
+  filter: drop-shadow(0 0 20px rgba(255,0,128,0.8));
 }
 
-/* Grid Layout for Memory Game and Puzzle */
-.grid {
+/* Fixed Share Link Button (Bottom Right) */
+#fixed-share-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 12px 20px;
+  background-color: #4CAF50;
+  color: #fff;
+  border: none;
+  border-radius: 25px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  z-index: 999;
+  transition: transform 0.3s ease;
+}
+
+#fixed-share-btn:hover {
+  transform: translateY(-3px);
+}
+
+/* Memory Game */
+#memory-grid {
   display: grid;
+  grid-template-columns: repeat(4, 1fr);
   gap: 10px;
-  justify-content: center;
-  align-items: center;
+  max-width: 400px;
   margin: 0 auto;
 }
 
-#memory-grid {
-  grid-template-columns: repeat(4, 80px);
-  grid-template-rows: repeat(4, 80px);
-}
-
 .card {
-  width: 100%;
-  height: 100%;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  aspect-ratio: 1;
+  background-color: #ff9a9e;
+  border-radius: 10px;
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: 2rem;
   cursor: pointer;
-  user-select: none;
-  transition: transform 0.3s ease;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  transform-style: preserve-3d;
+}
+
+.card:hover {
+  transform: translateY(-5px) rotateY(10deg);
+  box-shadow: 0 6px 8px rgba(0,0,0,0.15);
 }
 
 .card.flipped {
-  background: #fdd;
   transform: rotateY(180deg);
 }
 
+/* Puzzle Game */
 #puzzle-grid {
-  grid-template-columns: repeat(3, 100px);
-  grid-template-rows: repeat(3, 100px);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+  max-width: 300px;
+  margin: 0 auto;
 }
 
 .puzzle-piece {
-  width: 100px;
-  height: 100px;
-  background-size: 300px 300px;
-  border: 1px solid #fff;
+  aspect-ratio: 1;
+  background-size: 300% 300%;
+  border: 2px solid #fff;
+  border-radius: 5px;
   cursor: grab;
-  transition: transform 0.2s;
+  transition: transform 0.4s ease-out;
+}
+
+.puzzle-piece:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
 .puzzle-piece.dragging {
-  opacity: 0.5;
+  opacity: 0.7;
+  transform: scale(1.1);
+  z-index: 10;
 }
 
-/* Additional style for selected piece on mobile tap-swap */
 .puzzle-piece.selected {
   border: 2px solid #ff4081;
 }
 
 /* Branching Stage */
-#branching-stage {
-  text-align: center;
+.branching-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
 }
 
 .branching-buttons button {
-  font-size: 1.5rem;
-  margin: 10px;
-  padding: 10px 20px;
+  padding: 12px 30px;
+  font-size: 1.2rem;
   border: none;
-  border-radius: 5px;
-  background: #ff4081;
-  color: #fff;
+  border-radius: 25px;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: all 0.3s ease;
+  font-family: 'Playfair Display', serif;
+  font-weight: 600;
+}
+
+#yes-btn {
+  background-color: #4CAF50;
+  color: white;
+}
+
+#no-btn {
+  background-color: #f44336;
+  color: white;
 }
 
 .branching-buttons button:hover {
-  background: #e91e63;
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
 /* Quotes Stage */
-#quotes-stage {
-  text-align: center;
-}
-
 #quotes-container {
   font-family: 'Dancing Script', cursive;
-  font-size: 2rem;
+  font-size: 1.8rem;
+  text-align: center;
+  color: #ff4081;
   padding: 20px;
+  background-color: rgba(255,255,255,0.8);
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease;
 }
 
-/* Form Stage */
-#form-stage form {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+#quotes-container:hover {
+  transform: scale(1.02);
 }
 
-#form-stage input, #form-stage textarea {
-  width: 80%;
-  max-width: 400px;
-  padding: 10px;
-  margin: 10px 0;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  font-family: 'Open Sans', Arial, sans-serif;
-}
-
-#form-stage button {
-  padding: 10px 20px;
-  font-size: 1.2rem;
-  border: none;
-  border-radius: 5px;
-  background: #ff4081;
-  color: #fff;
-  cursor: pointer;
-}
-
-/* Redesigned Certificate Stage */
+/* Certificate Stage (Love Message) */
 #certificate-stage {
   position: relative;
-  padding: 20px;
-  background: linear-gradient(45deg, #fff5f5, #fff);
+  padding: 40px;
+  background: #fff;
   border: 20px solid #ffd1dc;
   box-shadow: 0 0 30px rgba(0,0,0,0.2);
-  overflow: visible;
+  overflow: hidden;
   width: 90%;
   max-width: 900px;
-  height: auto;
   min-height: 600px;
   margin: 20px auto;
   color: #333;
-}
-
-#certificate-stage::before,
-#certificate-stage::after {
-  content: "";
-  position: absolute;
-  width: 100px;
-  height: 100px;
-  background-size: contain;
-  background-repeat: no-repeat;
-  opacity: 0.2;
-}
-
-#certificate-stage::before {
-  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23ff4081" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>');
-  top: 20px;
-  left: 20px;
-}
-
-#certificate-stage::after {
-  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23ff4081" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>');
-  bottom: 20px;
-  right: 20px;
-  transform: rotate(180deg);
+  border-radius: 15px;
 }
 
 #certificate-content {
@@ -251,118 +275,93 @@ body.live-background {
   height: 100%;
 }
 
-/* Each scattered quote */
-.quote-piece {
-  position: absolute;
-  width: 150px;
-  background: #fff;
-  border: 1px dashed #ccc;
-  padding: 10px;
-  box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
-  font-family: 'Dancing Script', cursive;
-  font-size: 1.1rem;
-  color: #6d4c4c;
-  line-height: 1.3;
-  opacity: 0.9;
-  transition: transform 0.3s ease;
-}
-
-.quote-piece:hover {
-  transform: scale(1.05) rotate(3deg);
-  z-index: 1;
-}
-
-/* Central block for names and promise */
+/* Certificate Header: Names and Promise */
 #certificate-central {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: rgba(255,255,255,0.9);
-  padding: 30px 40px;
-  border-radius: 15px;
-  box-shadow: 0 0 20px rgba(0,0,0,0.1);
-  backdrop-filter: blur(5px);
   text-align: center;
-}
-
-#certificate-central h2 {
-  font-size: 3.5rem;
-  color: #c7375f;
+  padding: 20px 30px;
+  border-bottom: 2px solid #ffd1dc;
   margin-bottom: 20px;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+#certificate-names {
   font-family: 'Great Vibes', cursive;
+  font-size: 3.5rem;
+  color: #ff4081;
+  margin-bottom: 10px;
 }
 
-#certificate-central p {
+#certificate-promise {
   font-family: 'Playfair Display', serif;
-  font-size: 1.4rem;
-  color: #5a3a3a;
-  line-height: 1.6;
-  max-width: 500px;
-  margin: 20px auto;
+  font-size: 1.2rem;
+  color: #333;
 }
 
-#certificate-central p::before {
-  content: open-quote;
-  font-size: 2.5rem;
-  color: #ff7aa3;
-  margin-right: 10px;
+/* Certificate Image (Paper-like) */
+#certificate-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 20px 0;
 }
 
-#certificate-central p::after {
-  content: close-quote;
-  font-size: 2.5rem;
-  color: #ff7aa3;
-  margin-left: 10px;
-}
-
-/* Screenshot Button */
-#screenshot-btn {
-  position: absolute;
-  bottom: 30px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: linear-gradient(45deg, #ff7aa3, #ff4081);
-  padding: 12px 30px;
-  font-size: 1.3rem;
-  border-radius: 25px;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+/* Download Button */
+#download-btn {
+  display: block;
+  margin: 20px auto 0 auto;
+  padding: 12px 25px;
+  background-color: #4CAF50;
   color: white;
   border: none;
+  border-radius: 25px;
   cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1.1rem;
+  font-weight: 600;
+  font-family: 'Playfair Display', serif;
 }
 
-#screenshot-btn:hover {
-  transform: translateX(-50%) scale(1.05);
-  box-shadow: 0 5px 15px rgba(255,64,129,0.3);
+#download-btn:hover {
+  background-color: #45a049;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
-#screenshot-btn::before {
-  content: '';
-  display: block;
-  width: 20px;
-  height: 20px;
-  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="white" d="M14 3h-4v2h4V3m-1 14c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2m6-6V8c0-1.1-.9-2-2-2h-2.1c-.2-1.1-1.2-2-2.4-2h-3c-1.2 0-2.2.9-2.4 2H6c-1.1 0-2 .9-2 2v7c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2m-2 0H6V8h2v3h2V8h4v3h2V8h2v7z"/></svg>');
-}
-
-/* Final View */
+/* Final View Stage */
 #final-view-stage {
   text-align: center;
 }
 
-#final-view-stage h2 {
-  font-size: 2.5rem;
-  font-family: 'Great Vibes', cursive;
+#final-message {
+  font-size: 2rem;
+  color: #ff4081;
+  margin-top: 20px;
+  font-family: 'Dancing Script', cursive;
+  position: relative;
+  display: inline-block;
 }
 
-#final-view-stage p {
-  font-size: 1.8rem;
-  margin-top: 20px;
-  font-family: 'Open Sans', sans-serif;
+#final-message::before,
+#final-message::after {
+  content: '';
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  opacity: 0.5;
+}
+
+#final-message::before {
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23ff4081" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>');
+  left: -60px;
+  top: -10px;
+}
+
+#final-message::after {
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23ff4081" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>');
+  right: -60px;
+  bottom: -10px;
+  transform: rotate(180deg);
 }
 
 /* Modal Popup Styles */
@@ -376,69 +375,93 @@ body.live-background {
   height: 100%;
   overflow: auto;
   background-color: rgba(0,0,0,0.7);
+  backdrop-filter: blur(5px);
 }
 
 .modal-content {
-  background-color: #fff;
+  background-color: #fefefe;
   margin: 15% auto;
-  padding: 20px;
-  border-radius: 8px;
+  padding: 30px;
+  border: 1px solid #888;
   width: 80%;
   max-width: 400px;
+  border-radius: 15px;
   text-align: center;
-  color: #333;
-  font-family: 'Open Sans', sans-serif;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  font-family: 'Playfair Display', serif;
+}
+
+.modal-buttons {
+  margin-top: 20px;
 }
 
 .modal-buttons button {
-  margin: 10px;
   padding: 10px 20px;
+  margin: 0 10px;
   border: none;
-  background: #ff4081;
-  color: #fff;
-  border-radius: 5px;
+  border-radius: 25px;
   cursor: pointer;
+  transition: all 0.3s ease;
   font-size: 1rem;
+  font-weight: 600;
+  font-family: 'Playfair Display', serif;
 }
 
-/* Media Queries for Responsiveness */
+#modal-confirm {
+  background-color: #4CAF50;
+  color: white;
+}
+
+#modal-cancel {
+  background-color: #f44336;
+  color: white;
+}
+
+.modal-buttons button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Responsive Design */
 @media (max-width: 600px) {
+  .stage {
+    padding: 20px;
+  }
+  .stage-title {
+    font-size: 2rem;
+  }
   #heartSVG {
-    width: 90vw;
-    max-width: 250px;
+    width: 150px;
+    height: 150px;
   }
   #memory-grid {
-    grid-template-columns: repeat(4, 60px);
-    grid-template-rows: repeat(4, 60px);
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 300px;
   }
   .card {
     font-size: 1.5rem;
   }
   #puzzle-grid {
-    grid-template-columns: repeat(3, 80px);
-    grid-template-rows: repeat(3, 80px);
+    max-width: 250px;
   }
-  .puzzle-piece {
-    width: 80px;
-    height: 80px;
-    background-size: 240px 240px;
+  .branching-buttons {
+    flex-direction: column;
+    align-items: center;
   }
-  #certificate-stage {
-    width: 95%;
-    height: auto;
-    min-height: 500px;
-    border-width: 10px;
+  #quotes-container {
+    font-size: 1.5rem;
   }
-  #certificate-central h2 {
+  #certificate-content {
+    padding: 20px;
+    min-height: 300px;
+  }
+  #certificate-names {
     font-size: 2.5rem;
   }
-  #certificate-central p {
-    font-size: 1.2rem;
+  #certificate-promise {
+    font-size: 1rem;
   }
-  #final-view-stage h2 {
-    font-size: 2rem;
-  }
-  #final-view-stage p {
+  #final-message {
     font-size: 1.5rem;
   }
 }
