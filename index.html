@@ -3,45 +3,44 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Love Story</title>
+  <title>Interactive Love Story</title>
   <!-- Favicon as a heart -->
   <link rel="icon" href="favicon.ico" />
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Dancing+Script:wght@400;700&family=Open+Sans:wght@400;600&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css" />
 </head>
-<body>
+<body class="dark-background">
   <div id="app">
-<!-- Stage 1: Heart Reviving -->
-<div id="heart-stage" class="stage active">
-  <svg id="heartSVG" viewBox="0 0 100 100" style="cursor: pointer;">
-    <defs>
-      <clipPath id="heartClip">
-        <rect id="fillRect" x="0" y="100" width="100" height="0" />
-      </clipPath>
-    </defs>
-    <path id="heartBase" d="M50 15
-      C 35 0, 10 0, 10 25
-      C 10 45, 50 75, 50 75
-      C 50 75, 90 45, 90 25
-      C 90 0, 65 0, 50 15 Z" 
-      fill="url(#heartGradient)" stroke="#aaa" stroke-width="2" />
-    <defs>
-      <linearGradient id="heartGradient" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#44001c" />
-        <stop offset="100%" stop-color="#8b001e" />
-      </linearGradient>
-    </defs>
-    <path d="M50 15
-      C 35 0, 10 0, 10 25
-      C 10 45, 50 75, 50 75
-      C 50 75, 90 45, 90 25
-      C 90 0, 65 0, 50 15 Z" 
-      fill="red" clip-path="url(#heartClip)" />
-  </svg>
-  <p class="stage-title"></p>
-</div>
-
+    <!-- Stage 1: Heart Reviving -->
+    <div id="heart-stage" class="stage active">
+      <svg id="heartSVG" viewBox="0 0 100 100" style="cursor: pointer;">
+        <defs>
+          <clipPath id="heartClip">
+            <rect id="fillRect" x="0" y="100" width="100" height="0" />
+          </clipPath>
+        </defs>
+        <path id="heartBase" d="M50 15
+          C 35 0, 10 0, 10 25
+          C 10 45, 50 75, 50 75
+          C 50 75, 90 45, 90 25
+          C 90 0, 65 0, 50 15 Z" 
+          fill="url(#heartGradient)" stroke="#aaa" stroke-width="2" />
+        <defs>
+          <linearGradient id="heartGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#44001c" />
+            <stop offset="100%" stop-color="#8b001e" />
+          </linearGradient>
+        </defs>
+        <path d="M50 15
+          C 35 0, 10 0, 10 25
+          C 10 45, 50 75, 50 75
+          C 50 75, 90 45, 90 25
+          C 90 0, 65 0, 50 15 Z" 
+          fill="red" clip-path="url(#heartClip)" />
+      </svg>
+      <p class="stage-title"></p>
+    </div>
 
     <!-- Stage 2: Memory Matching Game -->
     <div id="memory-stage" class="stage">
