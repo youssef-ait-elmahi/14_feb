@@ -5,57 +5,54 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Love Story</title>
   <!-- Favicon as a heart -->
-  <link rel="icon" href="favicon.ico" type="image/x-icon">
-  <!-- Google Fonts: Great Vibes for headings, Dancing Script & Open Sans for body -->
-  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Dancing+Script:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="icon" href="favicon.ico" />
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Dancing+Script:wght@400;700&family=Open+Sans:wght@400;600&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
   <div id="app">
-    <!-- Stage 1: Heart Healing -->
-    <div id="heart-stage" class="stage active">
-      <svg id="heartSVG" viewBox="0 0 100 100" style="cursor: pointer;">
-        <defs>
-          <clipPath id="heartClip">
-            <rect id="fillRect" x="0" y="100" width="100" height="0" />
-          </clipPath>
-        </defs>
-        <path id="heartBase" d="M50 15
-          C 35 0, 10 0, 10 25
-          C 10 45, 50 75, 50 75
-          C 50 75, 90 45, 90 25
-          C 90 0, 65 0, 50 15 Z" 
-          fill="url(#heartGradient)" stroke="#aaa" stroke-width="2" />
-        <defs>
-          <linearGradient id="heartGradient" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#44001c" />
-            <stop offset="100%" stop-color="#8b001e" />
-          </linearGradient>
-        </defs>
-        <path d="M50 15
-          C 35 0, 10 0, 10 25
-          C 10 45, 50 75, 50 75
-          C 50 75, 90 45, 90 25
-          C 90 0, 65 0, 50 15 Z" 
-          fill="red" clip-path="url(#heartClip)" />
-      </svg>
-      <p class="stage-title"></p>
-    </div>
+<!-- Stage 1: Heart Reviving -->
+<div id="heart-stage" class="stage active">
+  <svg id="heartSVG" viewBox="0 0 100 100" style="cursor: pointer;">
+    <defs>
+      <clipPath id="heartClip">
+        <rect id="fillRect" x="0" y="100" width="100" height="0" />
+      </clipPath>
+    </defs>
+    <path id="heartBase" d="M50 15
+      C 35 0, 10 0, 10 25
+      C 10 45, 50 75, 50 75
+      C 50 75, 90 45, 90 25
+      C 90 0, 65 0, 50 15 Z" 
+      fill="url(#heartGradient)" stroke="#aaa" stroke-width="2" />
+    <defs>
+      <linearGradient id="heartGradient" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#44001c" />
+        <stop offset="100%" stop-color="#8b001e" />
+      </linearGradient>
+    </defs>
+    <path d="M50 15
+      C 35 0, 10 0, 10 25
+      C 10 45, 50 75, 50 75
+      C 50 75, 90 45, 90 25
+      C 90 0, 65 0, 50 15 Z" 
+      fill="red" clip-path="url(#heartClip)" />
+  </svg>
+  <p class="stage-title"></p>
+</div>
+
 
     <!-- Stage 2: Memory Matching Game -->
     <div id="memory-stage" class="stage">
       <h2 class="stage-title">Memory Matching Game</h2>
-      <div id="memory-grid" class="grid">
-        <!-- Cards generated dynamically by JS -->
-      </div>
+      <div id="memory-grid" class="grid"></div>
     </div>
 
     <!-- Stage 3: Jigsaw Puzzle -->
     <div id="puzzle-stage" class="stage">
       <h2 class="stage-title">Jigsaw Puzzle</h2>
-      <div id="puzzle-grid" class="grid puzzle-grid">
-        <!-- Puzzle pieces generated dynamically by JS -->
-      </div>
+      <div id="puzzle-grid" class="grid puzzle-grid"></div>
     </div>
 
     <!-- Stage 4: "Do you love me?" Branching -->
@@ -73,36 +70,34 @@
       <div id="quotes-container"></div>
     </div>
 
-    <!-- Stage 6: Promise Form -->
-    <div id="form-stage" class="stage">
-      <h2 class="stage-title">Make a Promise</h2>
-      <form id="promise-form">
-        <input type="text" id="your-name" placeholder="Your Name" required>
-        <input type="text" id="soulmate-name" placeholder="Your Soulmate's Name" required>
-        <textarea id="promise" placeholder="Your Promise/Vow" required></textarea>
-        <button type="submit">Submit</button>
-      </form>
-    </div>
-
-    <!-- Stage 7: Final Certificate -->
+    <!-- Stage 7: Certificate (Love Message) -->
     <div id="certificate-stage" class="stage">
       <div id="certificate-content">
-        <!-- Certificate content generated dynamically -->
+        <!-- Header overlay with names and promise -->
+        <div id="certificate-central">
+          <div id="certificate-names"></div>
+          <div id="certificate-promise"></div>
+        </div>
+        <!-- Paper-like image -->
+        <img id="certificate-image" src="images/love-message-bg.png" alt="Love Message">
       </div>
-      <button id="screenshot-btn">Take Screenshot</button>
+      <button id="download-btn">Download Love Message</button>
     </div>
 
-    <!-- Stage 8: Final View -->
+    <!-- Stage 8: Final View (Fixed Last Quote) -->
     <div id="final-view-stage" class="stage">
-      <h2 class="stage-title">You are meant for each other</h2>
+      <h2 class="stage-title">Your Love Story</h2>
       <p id="final-message"></p>
     </div>
   </div>
 
-  <!-- Custom Modal for Popups -->
+  <!-- Fixed Share Link Button (visible on heart stage if no hashed data exists) -->
+  <button id="fixed-share-btn">Share Link</button>
+
+  <!-- Custom Modal for Popups and Share Form -->
   <div id="modal" class="modal">
     <div class="modal-content">
-      <p id="modal-message"></p>
+      <div id="modal-inner"></div>
       <div class="modal-buttons">
         <button id="modal-confirm">OK</button>
         <button id="modal-cancel" style="display:none;">Cancel</button>
@@ -119,7 +114,7 @@
   <audio id="buttonClickSound" src="audio/button-click.mp3"></audio>
   <audio id="romanticSong" src="audio/romantic-song.mp3" loop></audio>
 
-  <!-- html2canvas for screenshot functionality -->
+  <!-- html2canvas for download functionality -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="js/script.js"></script>
 </body>
