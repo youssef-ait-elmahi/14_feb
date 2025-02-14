@@ -6,13 +6,15 @@ const stages = {
   puzzle: document.getElementById('puzzle-stage'),
   branching: document.getElementById('branching-stage'),
   quotes: document.getElementById('quotes-stage'),
-  form: document.getElementById('form-stage'),
+  form: document.getElementById('promise-form'), // optional form element if exists
   certificate: document.getElementById('certificate-stage'),
   final: document.getElementById('final-view-stage')
 };
+document.body.classList.add('dark-background');
+
 const body = document.body;
 
-// Audio elements
+/* Audio elements */
 const reviveSound = document.getElementById('reviveSound');
 const heartbeatSound = document.getElementById('heartbeatSound');
 const cardFlipSound = document.getElementById('cardFlipSound');
@@ -39,7 +41,7 @@ function transitionToStage(stageName) {
 
 /**
  * checkLockout()
- * Checks for a 24-hour lockout from previous negative response.
+ * Checks for a 24-hour lockout from a previous negative response.
  */
 function checkLockout() {
   const lockoutTimestamp = localStorage.getItem('lockoutTimestamp');
@@ -58,7 +60,7 @@ function checkLockout() {
 }
 
 /* ===============================
-   Stage 1: Heart Healing
+   Stage 1: Heart Reviving
    =============================== */
 const maxBlood = 100;
 let bloodLevel = 0;
@@ -82,7 +84,11 @@ function updateHeartState() {
       heartbeatSound.currentTime = 0;
       heartbeatSound.play();
     }
-    body.classList.add('live-background');
+    // When the heart is fully revived, remove dark background and add colored background to the body.
+    body.classList.remove('dark-background');
+    body.classList.add('colored-background');
+    // Also remove grayscale from the heart stage container
+    document.getElementById('heart-stage').classList.add('active-color');
     setTimeout(() => {
       transitionToStage('memory');
     }, 6000);
@@ -93,7 +99,8 @@ function updateHeartState() {
   }
 }
 
-// Heart click event with beat animation
+
+
 heartSVG.addEventListener('click', () => {
   if (bloodLevel < maxBlood) {
     heartSVG.classList.add("beat");
@@ -116,6 +123,79 @@ setInterval(() => {
     updateHeartState();
   }
 }, intervalTime);
+
+/* ===============================
+   Fixed Share Link Button (Bottom Right)
+   =============================== */
+const fixedShareBtn = document.getElementById('fixed-share-btn');
+if (getHashedData()) {
+  fixedShareBtn.style.display = "none";
+} else {
+  fixedShareBtn.style.display = "block";
+}
+fixedShareBtn.addEventListener('click', showShareForm);
+
+/* ===============================
+   Stage 1 Share Form (Modal)
+   =============================== */
+function showShareForm() {
+  buttonClickSound.currentTime = 0;
+  buttonClickSound.play();
+  const modalInner = document.getElementById('modal-inner');
+  modalInner.innerHTML = `
+    <h3>Share Your Love</h3>
+    <input type="text" id="share-your-name" placeholder="Your Name" style="width:90%; padding:8px; margin:10px 0;">
+    <input type="text" id="share-partner-name" placeholder="Partner's Name" style="width:90%; padding:8px; margin:10px 0;">
+    <input type="text" id="share-promise" placeholder="Your Message" style="width:90%; padding:8px; margin:10px 0;">
+    <button id="share-submit" style="padding:10px 20px; background:#4CAF50; color:#fff; border:none; border-radius:5px; cursor:pointer;">Share</button>
+  `;
+  const modal = document.getElementById('modal');
+  modal.style.display = "block";
+  
+  document.getElementById('share-submit').onclick = function() {
+    const yourName = document.getElementById('share-your-name').value.trim();
+    const partnerName = document.getElementById('share-partner-name').value.trim();
+    const promiseText = document.getElementById('share-promise').value.trim() || "Our love is eternal.";
+    if (yourName && partnerName) {
+      const currentURL = window.location.origin + window.location.pathname;
+      // Hash the data (Base64 encoded JSON) for obscurity
+      const dataObj = { yourName, partnerName, promise: promiseText };
+      const encodedData = btoa(JSON.stringify(dataObj));
+      const shareURL = `${currentURL}#data=${encodedData}`;
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(shareURL).then(() => {
+          showModal("Love Message URL copied to clipboard!", function(){});
+        });
+      } else {
+        const tempInput = document.createElement('input');
+        document.body.appendChild(tempInput);
+        tempInput.value = shareURL;
+        tempInput.select();
+        document.execCommand('copy');
+        document.body.removeChild(tempInput);
+        showModal("Love Message URL copied to clipboard!", function(){});
+      }
+      modal.style.display = "none";
+    } else {
+      showModal("Please fill in both names.", function(){});
+    }
+  };
+}
+
+/* Utility: Get hashed data from URL hash */
+function getHashedData() {
+  if (window.location.hash.startsWith("#data=")) {
+    try {
+      const encoded = window.location.hash.substring(6);
+      const jsonStr = atob(encoded);
+      return JSON.parse(jsonStr);
+    } catch (e) {
+      console.error("Error decoding hashed data:", e);
+      return null;
+    }
+  }
+  return null;
+}
 
 /* ===============================
    Stage 2: Memory Matching Game
@@ -201,7 +281,7 @@ function shuffleArray(array) {
 }
 
 /* ===============================
-   Stage 3: Draggable Jigsaw Puzzle with Unsplash Image
+   Stage 3: Jigsaw Puzzle with Unsplash Image
    =============================== */
 const puzzleGrid = document.getElementById('puzzle-grid');
 let puzzlePieces = [];
@@ -238,7 +318,7 @@ function createPuzzlePieces(imageUrl) {
       piece.addEventListener('drop', onDrop);
       piece.addEventListener('dragend', onDragEnd);
       
-      // Add touch event listener for mobile tap-swap
+      // Touch-based swapping for mobile (tap-to-swap)
       piece.addEventListener('touchend', handleTouchSwap);
       
       puzzleGrid.appendChild(piece);
@@ -284,7 +364,6 @@ function onDragEnd(e) {
   draggedPiece = null;
 }
 
-// Function to swap two puzzle pieces (used for drag and touch)
 function swapPieces(piece1, piece2) {
   let tempIndex = piece1.dataset.currentIndex;
   piece1.dataset.currentIndex = piece2.dataset.currentIndex;
@@ -294,26 +373,22 @@ function swapPieces(piece1, piece2) {
   piece1.style.order = piece2.style.order;
   piece2.style.order = tempOrder;
   
-  // Remove any "selected" highlight if present
   piece1.classList.remove('selected');
   piece2.classList.remove('selected');
 }
 
-// Touch-based swapping for mobile devices
+// Touch-based swapping for mobile (tap-to-swap)
 let selectedPiece = null;
 function handleTouchSwap(e) {
   e.preventDefault();
   const piece = e.currentTarget;
-  // If no piece is selected, mark this one as selected
   if (!selectedPiece) {
     selectedPiece = piece;
     piece.classList.add('selected');
   } else if (selectedPiece === piece) {
-    // Tapping the same piece deselects it
     selectedPiece.classList.remove('selected');
     selectedPiece = null;
   } else {
-    // Swap the selected piece with the tapped piece
     swapPieces(selectedPiece, piece);
     selectedPiece = null;
     checkPuzzleSolved();
@@ -330,7 +405,7 @@ function checkPuzzleSolved() {
 }
 
 /* ===============================
-   Stage 4: "Do you love me?" Branching with Custom Modal
+   Stage 4: "Do you love me?" Branching (Modal)
    =============================== */
 let noCount = 0;
 if (checkLockout()) {
@@ -387,64 +462,81 @@ function startQuotesSlideshow() {
     } else {
       clearInterval(quoteInterval);
       setTimeout(() => {
-        transitionToStage('form');
+        // After quotes, if hashed data exists, go to certificate; else, show final view with fixed last quote.
+        const data = getHashedData();
+        if (data && data.yourName && data.partnerName) {
+          certificateData = {
+            yourName: data.yourName,
+            soulmateName: data.partnerName,
+            promiseText: data.promise || "Our love is eternal."
+          };
+          transitionToStage('certificate');
+          generateCertificate();
+        } else {
+          transitionToStage('final');
+          document.getElementById('final-message').textContent = loveQuotes[loveQuotes.length - 1];
+        }
       }, 1200);
     }
   }, 6500);
 }
 
 /* ===============================
-   Stage 6: Promise Form
+   Stage 6: Promise Form (Only if no hashed data exists)
    =============================== */
 const promiseForm = document.getElementById('promise-form');
 let certificateData = {};
-promiseForm.addEventListener('submit', (e) => {
-  e.preventDefault();
-  buttonClickSound.currentTime = 0;
-  buttonClickSound.play();
-  const yourName = document.getElementById('your-name').value;
-  const soulmateName = document.getElementById('soulmate-name').value;
-  const promiseText = document.getElementById('promise').value;
-  certificateData = { yourName, soulmateName, promiseText };
-  transitionToStage('certificate');
-  generateCertificate();
-});
+if (getHashedData() && getHashedData().yourName && getHashedData().partnerName) {
+  const data = getHashedData();
+  certificateData = {
+    yourName: data.yourName,
+    soulmateName: data.partnerName,
+    promiseText: data.promise || "Our love is eternal."
+  };
+  // Proceed normally through stages.
+} else if(promiseForm) {
+  promiseForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    buttonClickSound.currentTime = 0;
+    buttonClickSound.play();
+    const yourName = document.getElementById('your-name').value;
+    const soulmateName = document.getElementById('soulmate-name').value;
+    const promiseText = document.getElementById('promise').value;
+    certificateData = { yourName, soulmateName, promiseText };
+    transitionToStage('certificate');
+    generateCertificate();
+  });
+}
 
 /* ===============================
-   Stage 7: Final Certificate & Screenshot
+   Stage 7: Certificate (Love Message) & Download Button
    =============================== */
 function generateCertificate() {
   const certificateContent = document.getElementById('certificate-content');
   certificateContent.innerHTML = "";
   
-  // Create scattered quote pieces
-  loveQuotes.forEach(quote => {
-    const quoteDiv = document.createElement('div');
-    quoteDiv.classList.add('quote-piece');
-    quoteDiv.textContent = quote;
-    const posX = Math.random() * 80;
-    const posY = Math.random() * 80;
-    const rotation = Math.random() * 30 - 15;
-    quoteDiv.style.left = posX + "%";
-    quoteDiv.style.top = posY + "%";
-    quoteDiv.style.transform = `rotate(${rotation}deg)`;
-    certificateContent.appendChild(quoteDiv);
-  });
-  
-  // Create central block for names and promise
-  const centralDiv = document.createElement('div');
-  centralDiv.id = "certificate-central";
-  centralDiv.innerHTML = `
-    <h2>${certificateData.yourName} &amp; ${certificateData.soulmateName}</h2>
-    <p>Promise: ${certificateData.promiseText}</p>
+  // Create header overlay with names and promise
+  const headerDiv = document.createElement('div');
+  headerDiv.id = "certificate-central";
+  headerDiv.innerHTML = `
+    <div id="certificate-names">${certificateData.yourName} to ${certificateData.soulmateName}</div>
+    <div id="certificate-promise">${certificateData.promiseText}</div>
   `;
-  certificateContent.appendChild(centralDiv);
+  certificateContent.appendChild(headerDiv);
+  
+  // Append the paper-like image
+  const certImage = document.createElement('img');
+  certImage.id = "certificate-image";
+  certImage.src = "images/love-message-bg.png";
+  certImage.alt = "Love Message";
+  certificateContent.appendChild(certImage);
 }
 
-document.getElementById('screenshot-btn').addEventListener('click', () => {
-  html2canvas(document.getElementById('certificate-stage')).then(canvas => {
+// Download button on certificate stage
+document.getElementById('download-btn').addEventListener('click', () => {
+  html2canvas(document.getElementById('certificate-stage'), { scale: 1 }).then(canvas => {
     const link = document.createElement('a');
-    link.download = 'certificate.png';
+    link.download = 'love-message.png';
     link.href = canvas.toDataURL();
     link.click();
   });
@@ -457,11 +549,11 @@ document.getElementById('screenshot-btn').addEventListener('click', () => {
 });
 
 /* ===============================
-   Stage 8: Final View
+   Stage 8: Final View (Fixed Last Quote)
    =============================== */
 function showFinalMessage() {
   const finalMessage = document.getElementById('final-message');
-  finalMessage.innerHTML = `<strong>${certificateData.yourName}</strong> and <strong>${certificateData.soulmateName}</strong>, you are meant for each other.`;
+  finalMessage.innerHTML = `<strong>${certificateData.yourName || "Guest"}</strong> and <strong>${certificateData.soulmateName || ""}</strong>, your Love Story is complete!`;
 }
 
 /* ===============================
@@ -469,15 +561,12 @@ function showFinalMessage() {
    =============================== */
 function showModal(message, onConfirm) {
   const modal = document.getElementById('modal');
-  const modalMessage = document.getElementById('modal-message');
-  const confirmBtn = document.getElementById('modal-confirm');
-  const cancelBtn = document.getElementById('modal-cancel');
-  
-  modalMessage.textContent = message;
-  cancelBtn.style.display = "none";
+  const modalInner = document.getElementById('modal-inner');
+  modalInner.innerHTML = `<p>${message}</p>`;
+  document.getElementById('modal-cancel').style.display = "none";
   modal.style.display = "block";
   
-  confirmBtn.onclick = function() {
+  document.getElementById('modal-confirm').onclick = function() {
     modal.style.display = "none";
     onConfirm();
   };
