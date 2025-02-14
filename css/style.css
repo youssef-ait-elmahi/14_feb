@@ -9,26 +9,22 @@
 ::selection {
   background: transparent;
 }
-/* Body background setup */
-body.dark-background {
-  background: #000; /* Fully dark background during healing */
-  transition: background 1s ease;
-}
-
-body.colored-background {
-  background: linear-gradient(135deg, #ff758c, #ff7eb3, #fca5f1);
-  transition: background 1s ease;
-}
 
 body {
   font-family: 'Playfair Display', serif;
-  background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 50%, #fca5f1 100%);
+  /* Initially dark gradient */
+  background: linear-gradient(135deg, #000, #000);
   color: #333;
   min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 20px;
+  transition: background 1s ease;
+}
+
+body.colored-background {
+  background: linear-gradient(135deg, #ff758c, #ff7eb3, #fca5f1);
 }
 
 #app {
@@ -68,16 +64,14 @@ body {
 #heart-stage {
   text-align: center;
   position: relative;
-  /* Entire viewport is dark until heart is full */
-  background-color: #000;
+  background-color: #000;  /* dark background */
   /* filter: grayscale(100%); */
   transition: filter 1s ease, background-color 1s ease;
 }
 
 #heart-stage.active-color {
   filter: grayscale(0%);
-  background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 50%, #fca5f1 100%);
-  
+  background: linear-gradient(135deg, #ff758c, #ff7eb3, #fca5f1);
 }
 
 #heartSVG {
@@ -422,6 +416,14 @@ body {
   box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
+/* Increase certificate image size on mobile devices */
+@media (max-width: 600px) {
+  #certificate-image {
+    width: 120%; /* increase size a bit */
+    margin: 0 auto; /* ensure it’s centered */
+  }
+}
+
 /* Responsive Design */
 @media (max-width: 600px) {
   .stage {
@@ -431,8 +433,8 @@ body {
     font-size: 2rem;
   }
   #heartSVG {
-    width: 150px;
-    height: 150px;
+    width: 152px;
+    height: 152px;
   }
   #memory-grid {
     grid-template-columns: repeat(3, 1fr);
